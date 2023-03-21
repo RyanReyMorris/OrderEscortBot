@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class OrderEscortBotApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OrderEscortBotApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OrderEscortBotApplication.class, args);
+    }
 
 }
