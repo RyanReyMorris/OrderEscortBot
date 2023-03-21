@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-master.yaml
+  - changeSet:
+      id: 1
+      author: eyakimov
+      changes:
+        - createTable:
+            tableName: customer
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: true
+              - column:
+                  name: chat_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_satisfied
+                  type: boolean
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_admin
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
