@@ -4,16 +4,20 @@ import com.github.ryanreymorris.orderescortbot.entity.Customer;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * Service for {@link Customer}.
+ */
 public interface CustomerService {
-
-    List<Customer> findAdmins();
 
     void saveCustomer(Customer Customer);
 
     Customer findCustomerById(Long id);
 
-    Customer createNewCustomer(Message message);
+    Optional<Customer> findLessBusyTecSupport();
+
+    void createNewCustomer(Message message);
 
     boolean checkIfCustomerIsNew(Long id);
 }

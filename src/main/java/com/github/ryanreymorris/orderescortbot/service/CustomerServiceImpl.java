@@ -2,23 +2,25 @@ package com.github.ryanreymorris.orderescortbot.service;
 
 import com.github.ryanreymorris.orderescortbot.entity.Customer;
 import com.github.ryanreymorris.orderescortbot.repository.CustomerRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
+/**
+ * Implementation of {@link CustomerService} interface.
+ */
 @Service
-public class CustomerServiceImpl implements CustomerService{
+public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private CustomerRepository repository;
-
-    @Override
-    public List<Customer> findAdmins() {
-        return repository.findAllByIsAdminIsTrue();
-    }
 
     @Override
     public void saveCustomer(Customer customer) {
@@ -32,18 +34,42 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public Customer createNewCustomer(Message message) {
+    public Optional<Customer> findLessBusyTecSupport() {
+        List<Customer> performers = repository.findLessBusyTecSupport();
+        if (performers.size() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(performers.get(new Random().nextInt(performers.size())));
+    }
+
+    @Override
+    public void createNewCustomer(Message message) {
+        User user = message.getFrom();
         Customer customer = new Customer();
-        customer.setId(message.getFrom().getId());
-        customer.setChatId(message.getChatId());
-        customer.setSatisfied(true);
-        customer.setAdmin(false);
+        customer.setUserName(user.getUserName());
+        customer.setName(getCustomerName(user));
+        customer.setId(user.getId());
         repository.save(customer);
-        return customer;
     }
 
     @Override
     public boolean checkIfCustomerIsNew(Long id) {
         return repository.findById(id).isEmpty();
+    }
+
+    private String getCustomerName(User user) {
+        String customerName;
+        String customerFirstName = user.getFirstName();
+        String customerLastName = user.getLastName();
+        if (StringUtils.isNoneEmpty(customerFirstName, customerLastName)) {
+            customerName = MessageFormat.format("{0} {1}", customerFirstName, customerLastName);
+        } else if (StringUtils.isNotEmpty(customerFirstName)) {
+            customerName = customerFirstName;
+        } else if (StringUtils.isNotEmpty(customerLastName)) {
+            customerName = customerLastName;
+        } else {
+            customerName = user.getUserName();
+        }
+        return customerName;
     }
 }

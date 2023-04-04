@@ -1,77 +1,42 @@
 package com.github.ryanreymorris.orderescortbot.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import javax.persistence.*;
 
-import java.util.Objects;
+import com.github.ryanreymorris.orderescortbot.handler.command.BotCommandEnum;
+import lombok.Data;
 
 @Entity(name = "Customer")
 @Table(name = "customer")
-@Getter
-@ToString
-@RequiredArgsConstructor
+@Data
 public class Customer {
 
     @Id
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "chat_id")
-    private Long chatId;
+    @Column(name = "last_message")
+    private Integer lastMessage;
+
+    @Column(name = "name")
+    private String name;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "contact_id", referencedColumnName = "id")
+    private ContactInfo contactInfo;
+
+    @Column(name = "user_name")
+    private String userName;
 
     @Column(name = "is_satisfied")
     private boolean isSatisfied;
 
-    @Column(name = "is_admin")
-    private boolean isAdmin;
+    @Column(name = "is_in_tec_sup_process")
+    private boolean isInTecSupProcess;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "is_service_call")
+    private boolean isServiceCall;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(Long chatId) {
-        this.chatId = chatId;
-    }
-
-    public boolean isSatisfied() {
-        return isSatisfied;
-    }
-
-    public void setSatisfied(boolean satisfied) {
-        isSatisfied = satisfied;
-    }
-
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Customer customer = (Customer) o;
-        return isSatisfied == customer.isSatisfied && isAdmin == customer.isAdmin && Objects.equals(id, customer.id) && Objects.equals(chatId, customer.chatId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, chatId, isSatisfied, isAdmin);
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "current_command")
+    private BotCommandEnum currentCommand;
 }

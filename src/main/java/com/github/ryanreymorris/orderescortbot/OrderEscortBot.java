@@ -1,50 +1,64 @@
 package com.github.ryanreymorris.orderescortbot;
 
 import com.github.ryanreymorris.orderescortbot.facade.BotFacadeService;
-import lombok.Getter;
-import lombok.Setter;
+import com.github.ryanreymorris.orderescortbot.handler.command.BotCommandEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.bots.DefaultBotOptions;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.starter.SpringWebhookBot;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
-@Getter
-@Setter
-public class OrderEscortBot extends SpringWebhookBot {
+@Component
+public class OrderEscortBot extends TelegramLongPollingBot {
 
-    private String botPath;
+    @Value("${bot.token}")
+    private String token;
 
-    private String botName;
-
-    private String botToken;
+    @Value("${bot.username}")
+    private String username;
 
     @Autowired
     private BotFacadeService botFacadeService;
 
-    public OrderEscortBot(SetWebhook setWebhook) {
-        super(setWebhook);
-    }
-
-    public OrderEscortBot(DefaultBotOptions options, SetWebhook setWebhook) {
-        super(options, setWebhook);
-    }
-
     @Override
-    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        return botFacadeService.handleUpdate(update);
+    public void onUpdateReceived(Update update) {
+        botFacadeService.handleUpdate(update);
     }
 
     @Override
     public String getBotUsername() {
-        return getBotName();
+        return username;
+    }
+
+    @Override
+    public String getBotToken() {
+        return token;
     }
 
     @Override
     public void onRegister() {
         super.onRegister();
+        List<BotCommand> botCommands = new ArrayList<>();
+        for (BotCommandEnum commandEnum : BotCommandEnum.values()) {
+            if (StringUtils.isNotEmpty(commandEnum.getCommandDescription())) {
+                BotCommand botCommand = new BotCommand(commandEnum.getCommandName(), commandEnum.getCommandDescription());
+                botCommands.add(botCommand);
+            }
+        }
+        try {
+            this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            //todo log
+        }
     }
 }
