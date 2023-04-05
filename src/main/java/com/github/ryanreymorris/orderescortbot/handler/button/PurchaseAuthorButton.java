@@ -39,13 +39,16 @@ public class PurchaseAuthorButton implements Button {
     @Autowired
     private PaginationStorage storage;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
-        Customer performer = customerService.findCustomerById(update.getCallbackQuery().getFrom().getId());
+        Customer performer = customerService.findById(update.getCallbackQuery().getFrom().getId());
         storage.resetPagination(performer.getId());
         Long authorId = Long.parseLong(update.getCallbackQuery().getData().replace(PURCHASE_AUTHOR.getCode(), ""));
         List<Purchase> purchaseList = purchaseService.findAllByAuthorId(authorId);
-        String messageText = getAuthorPurchasesList(purchaseList, customerService.findCustomerById(authorId).getUserName());
+        String messageText = getAuthorPurchasesList(purchaseList, customerService.findById(authorId).getUserName());
         String getButtonData = MessageFormat.format("{0}{1}", ButtonEnum.GET_CONTACT.getCode(), authorId.toString());
         String deleteButtonData = MessageFormat.format("{0}{1}", ButtonEnum.DELETE_AUTHOR_PURCHASES.getCode(), authorId.toString());
         ButtonKeyboard buttonKeyboard = new ButtonKeyboard();
@@ -72,6 +75,9 @@ public class PurchaseAuthorButton implements Button {
         return purchases.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return ButtonEnum.PURCHASE_AUTHOR;

@@ -23,16 +23,22 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository repository;
 
     @Override
-    public void saveCustomer(Customer customer) {
+    public void save(Customer customer) {
         repository.save(customer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Customer findCustomerById(Long id) {
+    public Customer findById(Long id) {
         return repository.findById(id).
                 orElseThrow(() -> new RuntimeException(MessageFormat.format("Покупателя с id = {0} не было найдено", id)));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Customer> findLessBusyTecSupport() {
         List<Customer> performers = repository.findLessBusyTecSupport();
@@ -42,8 +48,11 @@ public class CustomerServiceImpl implements CustomerService {
         return Optional.of(performers.get(new Random().nextInt(performers.size())));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void createNewCustomer(Message message) {
+    public void create(Message message) {
         User user = message.getFrom();
         Customer customer = new Customer();
         customer.setUserName(user.getUserName());
@@ -52,11 +61,20 @@ public class CustomerServiceImpl implements CustomerService {
         repository.save(customer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean checkIfCustomerIsNew(Long id) {
         return repository.findById(id).isEmpty();
     }
 
+    /**
+     * Get available customer name.
+     *
+     * @param user - telegram user.
+     * @return username.
+     */
     private String getCustomerName(User user) {
         String customerName;
         String customerFirstName = user.getFirstName();

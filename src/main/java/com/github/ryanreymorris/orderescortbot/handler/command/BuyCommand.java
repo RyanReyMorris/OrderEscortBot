@@ -2,7 +2,6 @@ package com.github.ryanreymorris.orderescortbot.handler.command;
 
 import com.github.ryanreymorris.orderescortbot.entity.Customer;
 import com.github.ryanreymorris.orderescortbot.entity.Purchase;
-import com.github.ryanreymorris.orderescortbot.entity.ServiceCall;
 import com.github.ryanreymorris.orderescortbot.handler.button.ButtonEnum;
 import com.github.ryanreymorris.orderescortbot.handler.button.ButtonKeyboard;
 import com.github.ryanreymorris.orderescortbot.service.BotMessageService;
@@ -60,27 +59,34 @@ public class BuyCommand implements Command {
     @Autowired
     private PaginationStorage storage;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleCommand(Update update) {
         Message message = update.hasCallbackQuery() ? update.getCallbackQuery().getMessage() : update.getMessage();
-        Customer customer = customerService.findCustomerById(message.getChatId());
+        Customer customer = customerService.findById(message.getChatId());
         if (customer.isServiceCall()) {
             storage.resetPagination(customer.getId());
             Long userId = customer.getId();
             List<Purchase> purchaseList = purchaseService.findAllByPerformerId(userId);
-            if (purchaseList.size() == 0) {
+            List<Customer> authors = purchaseList.stream()
+                    .map(Purchase::getAuthor)
+                    .distinct()
+                    .toList();
+            if (authors.size() == 0) {
                 SendMessage sendMessage = replyMessagesService.createMessage(NO_PURCHASE_REQUEST, userId);
                 botMessageService.updateLastMessage(sendMessage, update);
                 return;
             }
-            ButtonKeyboard buttonKeyboard = getPaginatedButtons(userId, purchaseList);
+            ButtonKeyboard buttonKeyboard = getPaginatedButtons(userId, authors);
             SendMessage sendMessage = replyMessagesService.createMessageWithButtons(SERVICE_CALL_REQUESTS_EXIST, customer.getId(), buttonKeyboard.getMessageButtons());
             botMessageService.updateLastMessage(sendMessage, update);
             return;
         }
         if (customer.getContactInfo() == null) {
             ButtonKeyboard buttonKeyboard = new ButtonKeyboard();
-            KeyboardButton keyboardButton  = new KeyboardButton();
+            KeyboardButton keyboardButton = new KeyboardButton();
             keyboardButton.setText("Предоставить контакты");
             keyboardButton.setRequestContact(true);
             buttonKeyboard.addReplyButton(0, keyboardButton);
@@ -89,7 +95,7 @@ public class BuyCommand implements Command {
             return;
         }
         customer.setCurrentCommand(BotCommandEnum.BUY);
-        customerService.saveCustomer(customer);
+        customerService.save(customer);
         SendMessage sendMessage = replyMessagesService.createMessage(BUY_MESSAGE, customer.getId());
         botMessageService.updateLastMessage(sendMessage, update);
     }
@@ -97,35 +103,38 @@ public class BuyCommand implements Command {
     /**
      * Get paginated buttons of service call requests.
      *
-     * @param userId       - id of user
-     * @param purchaseList - list of purchase requests.
+     * @param userId  - id of user
+     * @param authors - list of purchases authors.
      * @return buttons.
      */
-    private ButtonKeyboard getPaginatedButtons(Long userId, List<Purchase> purchaseList) {
+    private ButtonKeyboard getPaginatedButtons(Long userId, List<Customer> authors) {
         //Get "from" and "to" pagination value
         Integer paginationCount = storage.getValue(userId);
         if (paginationCount == null) {
             paginationCount = storage.increaseValue(userId);
         }
         int from = paginationCount - storage.getDeltaValue();
-        int to = Math.min(paginationCount, purchaseList.size());
+        int to = Math.min(paginationCount, authors.size());
         //create buttons
         ButtonKeyboard buttonKeyboard = new ButtonKeyboard();
         for (int i = from; i < to; i++) {
-            Purchase purchase = purchaseList.get(i);
-            String buttonData = MessageFormat.format("{0}{1}", ButtonEnum.PURCHASE_AUTHOR.getCode(), purchase.getAuthor().getId().toString());
-            buttonKeyboard.addMessageButton(i, buttonData, purchase.getAuthor().getUserName());
+            Customer author = authors.get(i);
+            String buttonData = MessageFormat.format("{0}{1}", ButtonEnum.PURCHASE_AUTHOR.getCode(), author.getId().toString());
+            buttonKeyboard.addMessageButton(i, buttonData, author.getUserName());
         }
         if (from != 0) {
             buttonKeyboard.addMessageButton(to, ButtonEnum.UNDO.getCode(), ButtonEnum.UNDO.getName());
         }
-        if (paginationCount < purchaseList.size()) {
+        if (paginationCount < authors.size()) {
             buttonKeyboard.addMessageButton(to, ButtonEnum.REDO.getCode(), ButtonEnum.REDO.getName());
         }
         buttonKeyboard.addMessageButton(to + 1, ButtonEnum.EXIT.getCode(), ButtonEnum.EXIT.getName());
         return buttonKeyboard;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BotCommandEnum getBotcommand() {
         return BotCommandEnum.BUY;

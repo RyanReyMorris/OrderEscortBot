@@ -70,12 +70,6 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
-                  name: is_satisfied
-                  type: boolean
-                  defaultValueBoolean: true
-                  constraints:
-                    nullable: true
-              - column:
                   name: is_in_tec_sup_process
                   type: boolean
                   defaultValueBoolean: false
@@ -97,7 +91,7 @@ databaseChangeLog:
       author: eyakimov
       changes:
         - createTable:
-            tableName: service_call
+            tableName: service_call_request
             columns:
               - column:
                   name: id
@@ -110,7 +104,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: true
-                    foreignKeyName: fk_service_call_customer_author
+                    foreignKeyName: fk_service_call_request_customer_author
                     references: customer(id)
                     deleteCascade: true
               - column:
@@ -118,7 +112,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: true
-                    foreignKeyName: fk_service_call_customer_performer
+                    foreignKeyName: fk_service_call_request_customer_performer
                     references: customer(id)
                     deleteCascade: true
               - column:
@@ -203,3 +197,8 @@ databaseChangeLog:
                     foreignKeyName: fk_purchase_product
                     references: product(id)
                     deleteCascade: true
+              - column:
+                  name: count
+                  type: integer
+                  constraints:
+                    nullable: true

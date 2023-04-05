@@ -4,6 +4,9 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+/**
+ * Customer purchase model.
+ */
 @Entity(name = "Purchase")
 @Table(name = "purchase")
 @Data
@@ -25,4 +28,7 @@ public class Purchase {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
+
+    @Column(name = "count")
+    private Integer count;
 }

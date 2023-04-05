@@ -1,5 +1,8 @@
 package com.github.ryanreymorris.orderescortbot.handler.button;
 
+/**
+ * Enumeration of {@link Button}.
+ */
 public enum ButtonEnum {
 
     EXIT("-Выйти-"),

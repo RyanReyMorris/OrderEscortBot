@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 
 import java.text.MessageFormat;
-import java.util.Optional;
 
 /**
  * Implementation of {@link ContactService} interface.
@@ -23,13 +22,19 @@ public class ContactServiceImpl implements ContactService {
     @Autowired
     private ContactMapper mapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void saveContact(Contact contact) {
+    public void save(Contact contact) {
         repository.save(mapper.contactToContactInfo(contact));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Contact findContactById(Long id) {
+    public Contact findById(Long id) {
         ContactInfo contactInfo = repository.findById(id).orElseThrow(
                 () -> new BotException(MessageFormat.format("Не было найдено контактной информации с id:", id)));
         return mapper.contactInfoToContact(contactInfo);

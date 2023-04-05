@@ -22,11 +22,14 @@ public class GetContactButton implements Button {
     @Autowired
     private BotMessageService botMessageService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
         Long userId = update.getCallbackQuery().getMessage().getChatId();
         Long authorId = Long.parseLong(update.getCallbackQuery().getData().replace(GET_CONTACT.getCode(), ""));
-        Contact contact = contactService.findContactById(authorId);
+        Contact contact = contactService.findById(authorId);
         SendContact sendContact = new SendContact();
         sendContact.setChatId(userId.toString());
         sendContact.setLastName(contact.getLastName());
@@ -36,6 +39,9 @@ public class GetContactButton implements Button {
         botMessageService.updateLastMessage(sendContact, update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return ButtonEnum.GET_CONTACT;

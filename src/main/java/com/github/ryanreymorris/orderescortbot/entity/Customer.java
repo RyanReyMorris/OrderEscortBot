@@ -5,6 +5,9 @@ import javax.persistence.*;
 import com.github.ryanreymorris.orderescortbot.handler.command.BotCommandEnum;
 import lombok.Data;
 
+/**
+ * Bot user model - Customemr.
+ */
 @Entity(name = "Customer")
 @Table(name = "customer")
 @Data
@@ -26,9 +29,6 @@ public class Customer {
 
     @Column(name = "user_name")
     private String userName;
-
-    @Column(name = "is_satisfied")
-    private boolean isSatisfied;
 
     @Column(name = "is_in_tec_sup_process")
     private boolean isInTecSupProcess;

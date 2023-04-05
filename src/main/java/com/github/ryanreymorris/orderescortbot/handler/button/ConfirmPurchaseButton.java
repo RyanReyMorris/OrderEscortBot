@@ -21,7 +21,7 @@ import static com.github.ryanreymorris.orderescortbot.handler.button.ButtonEnum.
 public class ConfirmPurchaseButton implements Button {
 
     private static final String NO_TEC_SUPPORT = """
-            :exclamation: К сожалению, в данный момент нет ни одного сводобного оператора.
+            :exclamation: К сожалению, в данный момент нет ни одного свободного оператора.
             Попробуйте выполнить запрос позже.
             """;
 
@@ -45,10 +45,12 @@ public class ConfirmPurchaseButton implements Button {
     @Autowired
     private ProductService productService;
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
-        Customer customer = customerService.findCustomerById(update.getCallbackQuery().getFrom().getId());
+        Customer customer = customerService.findById(update.getCallbackQuery().getFrom().getId());
         List<Purchase> purchaseList = purchaseService.findAllByAuthorId(customer.getId());
         Customer performer;
         if (!purchaseList.isEmpty()) {
@@ -64,16 +66,29 @@ public class ConfirmPurchaseButton implements Button {
             }
         }
         Long productId = Long.parseLong(update.getCallbackQuery().getData().replace(CONFIRM_PURCHASE.getCode(), ""));
-        Product product = productService.findProductById(productId);
+        List<Purchase> list = purchaseList.stream()
+                .filter(purchase -> purchase.getProduct().getId().equals(productId))
+                .toList();
         Purchase purchase = new Purchase();
-        purchase.setAuthor(customer);
-        purchase.setProduct(product);
-        purchase.setPerformer(performer);
+        if (!list.isEmpty()) {
+            purchase = list.get(0);
+            Integer count = purchase.getCount() + 1;
+            purchase.setCount(count);
+        } else {
+            Product product = productService.findById(productId);
+            purchase.setAuthor(customer);
+            purchase.setProduct(product);
+            purchase.setPerformer(performer);
+            purchase.setCount(1);
+        }
         purchaseService.save(purchase);
         SendMessage sendMessage = replyMessagesService.createMessage(SUCCESS_PURCHASE, customer.getId());
         botMessageService.updateLastMessage(sendMessage, update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return ButtonEnum.CONFIRM_PURCHASE;

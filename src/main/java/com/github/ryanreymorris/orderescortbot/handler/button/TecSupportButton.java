@@ -30,9 +30,12 @@ public class TecSupportButton implements Button {
     @Autowired
     private BotMessageService botMessageService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
-        Customer user = customerService.findCustomerById(update.getCallbackQuery().getMessage().getChatId());
+        Customer user = customerService.findById(update.getCallbackQuery().getMessage().getChatId());
         Long authorId = Long.parseLong(update.getCallbackQuery().getData().replace(TEC_SUPPORT.getCode(), ""));
         String getButtonData = MessageFormat.format("{0}{1}", ButtonEnum.GET_CONTACT.getCode(), authorId.toString());
         String deleteButtonData = MessageFormat.format("{0}{1}", ButtonEnum.DELETE_TS_REQUEST.getCode(), authorId.toString());
@@ -44,6 +47,9 @@ public class TecSupportButton implements Button {
         botMessageService.updateLastMessage(sendMessage, update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return TEC_SUPPORT;

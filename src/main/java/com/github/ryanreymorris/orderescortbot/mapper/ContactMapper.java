@@ -5,6 +5,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 
+/**
+ * Mapstruct Mapper of {@link Contact}.
+ */
 @Mapper(componentModel = "spring")
 public interface ContactMapper {
 

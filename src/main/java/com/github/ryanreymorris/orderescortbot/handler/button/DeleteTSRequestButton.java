@@ -27,6 +27,9 @@ public class DeleteTSRequestButton implements Button {
     @Autowired
     private ReplyMessagesService replyMessagesService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
         Long userId = update.getCallbackQuery().getMessage().getChatId();
@@ -36,6 +39,9 @@ public class DeleteTSRequestButton implements Button {
         botMessageService.updateLastMessage(sendMessage, update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return ButtonEnum.DELETE_TS_REQUEST;

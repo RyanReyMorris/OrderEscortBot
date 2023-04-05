@@ -3,7 +3,6 @@ package com.github.ryanreymorris.orderescortbot.service;
 import com.github.ryanreymorris.orderescortbot.entity.Customer;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -11,13 +10,39 @@ import java.util.Optional;
  */
 public interface CustomerService {
 
-    void saveCustomer(Customer Customer);
+    /**
+     * Save customer to db.
+     *
+     * @param customer - Customer.
+     */
+    void save(Customer customer);
 
-    Customer findCustomerById(Long id);
+    /**
+     * Find customer by id.
+     *
+     * @param id - id of customer.
+     */
+    Customer findById(Long id);
 
+    /**
+     * Find less busy operator by his tec-support request count.
+     *
+     * @return optional of Customer.
+     */
     Optional<Customer> findLessBusyTecSupport();
 
-    void createNewCustomer(Message message);
+    /**
+     * Create new customer by telegram message.
+     *
+     * @param message - telegram message.
+     */
+    void create(Message message);
 
+    /**
+     * Check if customer with following id already exist in db.
+     *
+     * @param id - customer id.
+     * @return {@code true} if exist, else {@code false}..
+     */
     boolean checkIfCustomerIsNew(Long id);
 }

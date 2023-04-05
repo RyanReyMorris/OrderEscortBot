@@ -1,5 +1,6 @@
 package com.github.ryanreymorris.orderescortbot;
 
+import com.github.ryanreymorris.orderescortbot.exception.BotException;
 import com.github.ryanreymorris.orderescortbot.facade.BotFacadeService;
 import com.github.ryanreymorris.orderescortbot.handler.command.BotCommandEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main telegram bot class.
+ */
 @Slf4j
 @Component
 public class OrderEscortBot extends TelegramLongPollingBot {
@@ -30,21 +34,33 @@ public class OrderEscortBot extends TelegramLongPollingBot {
     @Autowired
     private BotFacadeService botFacadeService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onUpdateReceived(Update update) {
         botFacadeService.handleUpdate(update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getBotUsername() {
         return username;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getBotToken() {
         return token;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onRegister() {
         super.onRegister();
@@ -57,8 +73,8 @@ public class OrderEscortBot extends TelegramLongPollingBot {
         }
         try {
             this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
-        } catch (TelegramApiException e) {
-            //todo log
+        } catch (TelegramApiException exception) {
+            throw new BotException(exception.getMessage(), exception);
         }
     }
 }

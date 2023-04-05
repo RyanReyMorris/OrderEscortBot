@@ -1,12 +1,10 @@
 package com.github.ryanreymorris.orderescortbot.service;
 
 import com.github.ryanreymorris.orderescortbot.entity.Product;
-import com.github.ryanreymorris.orderescortbot.handler.command.BotCommandEnum;
 import com.github.ryanreymorris.orderescortbot.repository.ProductRepository;
 import com.github.ryanreymorris.orderescortbot.util.ImageUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,13 +27,19 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository repository;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void saveProduct(Product product) {
+    public void save(Product product) {
         byte[] compressedPhoto = ImageUtil.compressImage(product.getPhoto());
         product.setPhoto(compressedPhoto);
         repository.save(product);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String createCaption(Product product) {
         StringBuilder caption = new StringBuilder();
@@ -47,8 +51,11 @@ public class ProductServiceImpl implements ProductService {
         return caption.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Product findProductById(Long id) {
+    public Product findById(Long id) {
         Product product = repository.findById(id).
                 orElseThrow(() -> new RuntimeException(MessageFormat.format("Товара с id = {0} не было найдено", id)));
         byte[] decompressedPhoto = ImageUtil.decompressImage(product.getPhoto());
@@ -56,6 +63,9 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initProducts() {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -68,11 +78,11 @@ public class ProductServiceImpl implements ProductService {
                 String fileNameWithoutExtension = FilenameUtils.removeExtension(files[i].getName());
                 product.setId(Long.valueOf(fileNameWithoutExtension));
                 product.setSeller("Егор");
-                product.setName("Продукт №" + i);
+                product.setName("Продукт №" + i+1);
                 product.setQuantity(50);
                 product.setPrice(1000L);
                 product.setPhoto(FileUtils.readFileToByteArray(files[i]));
-                saveProduct(product);
+                save(product);
             }
         } catch (IOException e) {
             e.printStackTrace();

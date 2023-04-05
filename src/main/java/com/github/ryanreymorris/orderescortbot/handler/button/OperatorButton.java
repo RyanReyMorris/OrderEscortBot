@@ -1,9 +1,8 @@
 package com.github.ryanreymorris.orderescortbot.handler.button;
 
 import com.github.ryanreymorris.orderescortbot.entity.Customer;
-import com.github.ryanreymorris.orderescortbot.entity.ServiceCall;
+import com.github.ryanreymorris.orderescortbot.entity.ServiceCallRequest;
 import com.github.ryanreymorris.orderescortbot.service.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -54,9 +53,12 @@ public class OperatorButton implements Button {
     @Autowired
     private BotMessageService botMessageService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
-        Customer author = customerService.findCustomerById(update.getCallbackQuery().getFrom().getId());
+        Customer author = customerService.findById(update.getCallbackQuery().getFrom().getId());
         if (author.getContactInfo() == null) {
             ButtonKeyboard buttonKeyboard = new ButtonKeyboard();
             KeyboardButton keyboardButton  = new KeyboardButton();
@@ -79,18 +81,21 @@ public class OperatorButton implements Button {
             return;
         }
         author.setInTecSupProcess(true);
-        customerService.saveCustomer(author);
-        ServiceCall serviceCall = new ServiceCall();
-        serviceCall.setId(author.getId());
-        serviceCall.setAuthor(author);
-        serviceCall.setPerformer(performer.get());
-        serviceCallService.save(serviceCall);
+        customerService.save(author);
+        ServiceCallRequest serviceCallRequest = new ServiceCallRequest();
+        serviceCallRequest.setId(author.getId());
+        serviceCallRequest.setAuthor(author);
+        serviceCallRequest.setPerformer(performer.get());
+        serviceCallService.save(serviceCallRequest);
         SendMessage sendMessageForAuthor = replyMessagesService.createMessage(SERVICE_CALL_MESSAGE, author.getId());
         botMessageService.updateLastMessage(sendMessageForAuthor, update);
         SendMessage sendMessageForPerformer = replyMessagesService.createMessage(MessageFormat.format(TS_REQUEST, author.getUserName()), performer.get().getId());
         botMessageService.sendNewMessageToUser(sendMessageForPerformer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return ButtonEnum.OPERATOR;

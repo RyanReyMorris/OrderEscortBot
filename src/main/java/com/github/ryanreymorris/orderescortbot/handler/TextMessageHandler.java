@@ -24,6 +24,23 @@ import java.text.MessageFormat;
 @Component
 public class TextMessageHandler implements UpdateHandler {
 
+    private static final String GET_CONTACT = """
+            Большое спасибо за предоставленный контакт!
+            """;
+
+    private static final String UNKNOWN_VENDOR_CODE = """
+            К сожалению, товара с таким артикулом не существует.
+            Проверьте правильность введенных данных.
+            """;
+
+    private static final String MAIL_COST_MESSAGE = """
+            Доставка до данного отделения будет составлять {0} рублей!
+            """;
+
+    private static final String UNKNOWN_MAIL_ADDRESS = """
+            К сожалению, мне не удается найти почтовое отделение с указанным индексом, попробуйте еще раз!
+            """;
+
     @Autowired
     private ReplyMessagesService replyMessagesService;
 
@@ -45,34 +62,17 @@ public class TextMessageHandler implements UpdateHandler {
     @Autowired
     private RussianMailService mailService;
 
-    private static final String GET_CONTACT = """
-            Большое спасибо за предоставленный контакт!
-            """;
-
-    private static final String UNKNOWN_VENDOR_CODE = """
-            К сожалению, товара с таким артикулом не существует.
-            Проверьте правильность введенных данных.
-            """;
-
-    private static final String MAIL_COST_MESSAGE = """
-            Доставка до данного отделения будет составлять {0} рублей!
-            """;
-
-    private static final String UNKNOWN_MAIL_ADDRESS = """
-            К сожалению, мне не удается найти почтовое отделение с указанным индексом, попробуйте еще раз!
-            """;
-
     /**
      * {@inheritDoc}
      */
     @Override
     public void handle(Update update) {
-        Customer customer = customerService.findCustomerById(update.getMessage().getChatId());
+        Customer customer = customerService.findById(update.getMessage().getChatId());
         Contact contact = update.getMessage().getContact();
         if (contact != null && contact.getUserId().equals(customer.getId())) {
-            contactService.saveContact(contact);
+            contactService.save(contact);
             customer.setContactInfo(mapper.contactToContactInfo(contact));
-            customerService.saveCustomer(customer);
+            customerService.save(customer);
             SendMessage sendMessage = replyMessagesService.createMessage(GET_CONTACT, customer.getId());
             botMessageService.updateLastMessage(sendMessage, update);
         } else {
@@ -80,9 +80,9 @@ public class TextMessageHandler implements UpdateHandler {
                 case INFO:
                     Long vendorCode = Long.valueOf(update.getMessage().getText());
                     customer.setCurrentCommand(BotCommandEnum.UNKNOWN);
-                    customerService.saveCustomer(customer);
+                    customerService.save(customer);
                     try {
-                        Product product = productService.findProductById(vendorCode);
+                        Product product = productService.findById(vendorCode);
                         String caption = productService.createCaption(product);
                         SendPhoto sendPhoto = replyMessagesService.createMessageWithPhoto(product.getPhoto(), caption, customer.getId());
                         botMessageService.updateLastMessage(sendPhoto, update);
@@ -93,10 +93,10 @@ public class TextMessageHandler implements UpdateHandler {
                     break;
                 case DELIVERY:
                     customer.setCurrentCommand(BotCommandEnum.UNKNOWN);
-                    customerService.saveCustomer(customer);
+                    customerService.save(customer);
                     ResponseEntity<RussianMailItem> response;
                     try {
-                        response = mailService.getPostsPlainJSON(update.getMessage().getText());
+                        response = mailService.getPackageTransferCost(update.getMessage().getText());
                     } catch (Exception exception) {
                         SendMessage sendMessage = replyMessagesService.createMessage(UNKNOWN_MAIL_ADDRESS, customer.getId());
                         botMessageService.updateLastMessage(sendMessage, update);
@@ -116,9 +116,9 @@ public class TextMessageHandler implements UpdateHandler {
                 case BUY:
                     vendorCode = Long.valueOf(update.getMessage().getText());
                     customer.setCurrentCommand(BotCommandEnum.UNKNOWN);
-                    customerService.saveCustomer(customer);
+                    customerService.save(customer);
                     try {
-                        Product product = productService.findProductById(vendorCode);
+                        Product product = productService.findById(vendorCode);
                         String caption = MessageFormat.format("{0} \n Оформить заказ?", productService.createCaption(product));
                         SendPhoto sendPhoto = replyMessagesService.createMessageWithPhoto(product.getPhoto(), caption, customer.getId());
                         String confirmButtonData = MessageFormat.format("{0}{1}", ButtonEnum.CONFIRM_PURCHASE.getCode(), product.getId());

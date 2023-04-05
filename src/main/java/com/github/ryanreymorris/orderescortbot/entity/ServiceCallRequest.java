@@ -1,13 +1,16 @@
 package com.github.ryanreymorris.orderescortbot.entity;
 
-import javax.persistence.*;
-
 import lombok.Data;
 
-@Entity(name = "ServiceCall")
-@Table(name = "service_call")
+import javax.persistence.*;
+
+/**
+ * Customer service call request.
+ */
+@Entity(name = "ServiceCallRequest")
+@Table(name = "service_call_request")
 @Data
-public class ServiceCall {
+public class ServiceCallRequest {
 
     @Id
     @Column(name = "id")

@@ -1,14 +1,14 @@
 package com.github.ryanreymorris.orderescortbot.repository;
 
-import com.github.ryanreymorris.orderescortbot.entity.ServiceCall;
+import com.github.ryanreymorris.orderescortbot.entity.ServiceCallRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 /**
- * {@link ServiceCall} repository.
+ * {@link ServiceCallRequest} repository.
  */
-public interface ServiceCallRepository extends JpaRepository<ServiceCall, Long> {
+public interface ServiceCallRepository extends JpaRepository<ServiceCallRequest, Long> {
 
-    List<ServiceCall> findAllByPerformerId(Long performerId);
+    List<ServiceCallRequest> findAllByPerformerId(Long performerId);
 }

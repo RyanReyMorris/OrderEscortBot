@@ -7,6 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Model that imitates products in e-shop db.
+ */
 @Entity(name = "Product")
 @Table(name = "product")
 @Data

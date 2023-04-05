@@ -28,6 +28,9 @@ public class DeleteAuthorPurchasesButton implements Button {
     @Autowired
     private ReplyMessagesService replyMessagesService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
         Long userId = update.getCallbackQuery().getMessage().getChatId();
@@ -37,6 +40,9 @@ public class DeleteAuthorPurchasesButton implements Button {
         botMessageService.updateLastMessage(sendMessage, update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return ButtonEnum.DELETE_AUTHOR_PURCHASES;

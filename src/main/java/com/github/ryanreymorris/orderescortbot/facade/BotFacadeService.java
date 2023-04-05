@@ -41,7 +41,7 @@ public class BotFacadeService {
     private void checkIsNewCustomer(Message message) {
         boolean isNewCustomer = message != null && customerService.checkIfCustomerIsNew(message.getChat().getId());
         if (isNewCustomer) {
-            customerService.createNewCustomer(message);
+            customerService.create(message);
         }
     }
 

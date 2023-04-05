@@ -1,7 +1,6 @@
 package com.github.ryanreymorris.orderescortbot.service;
 
 import com.vdurmont.emoji.EmojiParser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -18,6 +17,9 @@ import java.io.InputStream;
 @Service
 public class ReplyMessagesServiceImpl implements ReplyMessagesService {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SendPhoto createMessageWithPhoto(byte[] photo, String caption, Long chatId) {
         InputStream inputStream = new ByteArrayInputStream(photo);

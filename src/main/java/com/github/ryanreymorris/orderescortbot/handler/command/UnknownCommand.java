@@ -29,13 +29,19 @@ public class UnknownCommand  implements Command {
     @Autowired
     private BotMessageService botMessageService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleCommand(Update update) {
-        Customer customer = customerService.findCustomerById(update.getMessage().getFrom().getId());
+        Customer customer = customerService.findById(update.getMessage().getFrom().getId());
         SendMessage sendMessage = replyMessagesService.createMessage(UNKNOWN_MESSAGE, customer.getId());
         botMessageService.updateLastMessage(sendMessage, update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BotCommandEnum getBotcommand() {
         return BotCommandEnum.UNKNOWN;

@@ -34,7 +34,7 @@ public class HelpCommand implements Command{
      */
     @Override
     public void handleCommand(Update update) {
-        Customer customer = customerService.findCustomerById(update.getMessage().getFrom().getId());
+        Customer customer = customerService.findById(update.getMessage().getFrom().getId());
         String messageText = MessageFormat.format(HELP_MESSAGE, customer.getName());
         SendMessage sendMessage = replyMessagesService.createMessage(messageText, customer.getId());
         botMessageService.updateLastMessage(sendMessage, update);
@@ -57,6 +57,9 @@ public class HelpCommand implements Command{
         return commandList.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BotCommandEnum getBotcommand() {
         return BotCommandEnum.HELP;

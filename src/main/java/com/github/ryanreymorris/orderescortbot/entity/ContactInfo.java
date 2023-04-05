@@ -7,6 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Customer contact information.
+ */
 @Entity(name = "ContactInfo")
 @Table(name = "contact_info")
 @Data
@@ -25,6 +28,9 @@ public class ContactInfo {
     @Column(name = "last_name")
     private String lastName;
 
+    /**
+     * Meta-info about customer such as profile photo etc.
+     */
     @Column(name = "v_card")
     private String vCard;
 }

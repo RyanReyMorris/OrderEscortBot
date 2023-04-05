@@ -28,13 +28,19 @@ public class ExitButton implements Button {
     @Autowired
     private BotMessageService botMessageService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
-        Customer customer = customerService.findCustomerById(update.getCallbackQuery().getFrom().getId());
+        Customer customer = customerService.findById(update.getCallbackQuery().getFrom().getId());
         SendMessage sendMessage = replyMessagesService.createMessage(EXIT_MESSAGE, customer.getId());
         botMessageService.updateLastMessage(sendMessage, update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return ButtonEnum.EXIT;

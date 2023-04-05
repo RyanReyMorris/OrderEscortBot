@@ -17,26 +17,33 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private PurchaseRepository repository;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void save(Purchase purchase) {
         repository.save(purchase);
     }
 
-    @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Purchase> findAllByPerformerId(Long performerId) {
         return repository.findAllByPerformerId(performerId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Purchase> findAllByAuthorId(Long authorId) {
         return repository.findAllByAuthorId(authorId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public void deleteAllByAuthorId(Long authorId) {

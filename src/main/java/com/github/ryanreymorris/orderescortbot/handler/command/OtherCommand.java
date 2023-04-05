@@ -1,7 +1,7 @@
 package com.github.ryanreymorris.orderescortbot.handler.command;
 
 import com.github.ryanreymorris.orderescortbot.entity.Customer;
-import com.github.ryanreymorris.orderescortbot.entity.ServiceCall;
+import com.github.ryanreymorris.orderescortbot.entity.ServiceCallRequest;
 import com.github.ryanreymorris.orderescortbot.handler.button.ButtonEnum;
 import com.github.ryanreymorris.orderescortbot.handler.button.ButtonKeyboard;
 import com.github.ryanreymorris.orderescortbot.service.BotMessageService;
@@ -53,20 +53,23 @@ public class OtherCommand implements Command {
     @Autowired
     private PaginationStorage storage;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleCommand(Update update) {
         Message message = update.hasCallbackQuery() ? update.getCallbackQuery().getMessage() : update.getMessage();
-        Customer customer = customerService.findCustomerById(message.getChatId());
+        Customer customer = customerService.findById(message.getChatId());
         if (customer.isServiceCall()) {
             storage.resetPagination(customer.getId());
             Long userId = customer.getId();
-            List<ServiceCall> serviceCallList = serviceCallService.findAllByPerformerId(userId);
-            if (serviceCallList.size() == 0) {
+            List<ServiceCallRequest> serviceCallRequestList = serviceCallService.findAllByPerformerId(userId);
+            if (serviceCallRequestList.size() == 0) {
                 SendMessage sendMessage = replyMessagesService.createMessage(NO_TS_REQUEST, userId);
                 botMessageService.updateLastMessage(sendMessage, update);
                 return;
             }
-            ButtonKeyboard buttonKeyboard = getPaginatedButtons(userId, serviceCallList);
+            ButtonKeyboard buttonKeyboard = getPaginatedButtons(userId, serviceCallRequestList);
             SendMessage sendMessage = replyMessagesService.createMessageWithButtons(SERVICE_CALL_REQUESTS_EXIST, customer.getId(), buttonKeyboard.getMessageButtons());
             botMessageService.updateLastMessage(sendMessage, update);
             return;
@@ -82,34 +85,37 @@ public class OtherCommand implements Command {
      * Get paginated buttons of service call requests.
      *
      * @param userId          - id of user
-     * @param serviceCallList - list of service call requests.
+     * @param serviceCallRequestList - list of service call requests.
      * @return buttons.
      */
-    private ButtonKeyboard getPaginatedButtons(Long userId, List<ServiceCall> serviceCallList) {
+    private ButtonKeyboard getPaginatedButtons(Long userId, List<ServiceCallRequest> serviceCallRequestList) {
         //Get "from" and "to" pagination value
         Integer paginationCount = storage.getValue(userId);
         if (paginationCount == null) {
             paginationCount = storage.increaseValue(userId);
         }
         int from = paginationCount - storage.getDeltaValue();
-        int to = Math.min(paginationCount, serviceCallList.size());
+        int to = Math.min(paginationCount, serviceCallRequestList.size());
         //create buttons
         ButtonKeyboard buttonKeyboard = new ButtonKeyboard();
         for (int i = from; i < to; i++) {
-            ServiceCall serviceCall = serviceCallList.get(i);
-            String buttonData = MessageFormat.format("{0}{1}", ButtonEnum.TEC_SUPPORT.getCode(), serviceCall.getAuthor().getId().toString());
-            buttonKeyboard.addMessageButton(i, buttonData, serviceCall.getAuthor().getUserName());
+            ServiceCallRequest serviceCallRequest = serviceCallRequestList.get(i);
+            String buttonData = MessageFormat.format("{0}{1}", ButtonEnum.TEC_SUPPORT.getCode(), serviceCallRequest.getAuthor().getId().toString());
+            buttonKeyboard.addMessageButton(i, buttonData, serviceCallRequest.getAuthor().getUserName());
         }
         if (from != 0) {
             buttonKeyboard.addMessageButton(to, ButtonEnum.UNDO.getCode(), ButtonEnum.UNDO.getName());
         }
-        if (paginationCount < serviceCallList.size()) {
+        if (paginationCount < serviceCallRequestList.size()) {
             buttonKeyboard.addMessageButton(to, ButtonEnum.REDO.getCode(), ButtonEnum.REDO.getName());
         }
         buttonKeyboard.addMessageButton(to + 1, ButtonEnum.EXIT.getCode(), ButtonEnum.EXIT.getName());
         return buttonKeyboard;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BotCommandEnum getBotcommand() {
         return BotCommandEnum.OTHER;

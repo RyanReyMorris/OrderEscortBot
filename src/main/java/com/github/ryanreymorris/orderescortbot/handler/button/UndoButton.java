@@ -23,13 +23,19 @@ public class UndoButton implements Button {
     @Autowired
     private OtherCommand command;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleClick(Update update) {
-        Customer user = customerService.findCustomerById(update.getCallbackQuery().getMessage().getChatId());
+        Customer user = customerService.findById(update.getCallbackQuery().getMessage().getChatId());
         storage.decreaseValue(user.getId());
         command.handleCommand(update);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ButtonEnum getButton() {
         return ButtonEnum.UNDO;
