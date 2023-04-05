@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    @Query(value = "select *  from (SELECT c.*,  RANK() OVER (ORDER BY COUNT(*)) rnk FROM customer c LEFT JOIN service_call s ON s.performer_id = c.id Group By c.id) joined where joined.is_service_call=true order by joined.rnk limit 1",
+    @Query(value = "select *  from (SELECT c.*,  RANK() OVER (ORDER BY COUNT(*)) rnk FROM customer c LEFT JOIN service_call_request s ON s.performer_id = c.id Group By c.id) joined where joined.is_service_call=true order by joined.rnk limit 1",
             nativeQuery = true)
     List<Customer> findLessBusyTecSupport();
 }
