@@ -7,11 +7,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Objects;
 
@@ -43,11 +45,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public String createCaption(Product product) {
         StringBuilder caption = new StringBuilder();
-        caption.append(MessageFormat.format(":gear: Артикул: {0}; \n",product.getId()));
-        caption.append(MessageFormat.format(":gear: Название: {0}; \n",product.getName()));
-        caption.append(MessageFormat.format(":gear: Цена: {0} рублей; \n",product.getPrice()));
-        caption.append(MessageFormat.format(":gear: Количество на складе: {0} штук; \n",product.getQuantity()));
-        caption.append(MessageFormat.format(":gear: Продавец: {0}; \n",product.getSeller()));
+        caption.append(MessageFormat.format(":gear: Артикул: {0}; \n", product.getId()));
+        caption.append(MessageFormat.format(":gear: Название: {0}; \n", product.getName()));
+        caption.append(MessageFormat.format(":gear: Цена: {0} рублей; \n", product.getPrice()));
+        caption.append(MessageFormat.format(":gear: Количество на складе: {0} штук; \n", product.getQuantity()));
+        caption.append(MessageFormat.format(":gear: Продавец: {0}; \n", product.getSeller()));
         return caption.toString();
     }
 
@@ -68,24 +70,25 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public void initProducts() {
-//        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-//        URL url = loader.getResource(photosDirectory);
-//        String path = Objects.requireNonNull(url).getPath();
-//        File[] files = new File(path).listFiles();
-//        try {
-//            for (int i = 0; i < Objects.requireNonNull(files).length; i++) {
-//                Product product = new Product();
-//                String fileNameWithoutExtension = FilenameUtils.removeExtension(files[i].getName());
-//                product.setId(Long.valueOf(fileNameWithoutExtension));
-//                product.setSeller("Егор");
-//                product.setName("Продукт №" + i+1);
-//                product.setQuantity(50);
-//                product.setPrice(1000L);
-//                product.setPhoto(FileUtils.readFileToByteArray(files[i]));
-//                save(product);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            ClassLoader cl = this.getClass().getClassLoader();
+            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(cl);
+            Resource[] resources = resolver.getResources("classpath*:/" + photosDirectory);
+            File[] files = resources[0].getFile().listFiles();
+            for (int i = 0; i < Objects.requireNonNull(files).length; i++) {
+                Product product = new Product();
+                String fileNameWithoutExtension = FilenameUtils.removeExtension(files[i].getName());
+                product.setId(Long.valueOf(fileNameWithoutExtension));
+                product.setSeller("ООО Продавец");
+                int number = i + 1;
+                product.setName("Продукт №" + number);
+                product.setQuantity(50);
+                product.setPrice(1000L);
+                product.setPhoto(FileUtils.readFileToByteArray(files[i]));
+                save(product);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
