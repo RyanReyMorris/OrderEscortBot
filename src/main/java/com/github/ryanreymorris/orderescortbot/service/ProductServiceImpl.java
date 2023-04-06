@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -68,11 +69,8 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public void initProducts() {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(photosDirectory);
-        String path = Objects.requireNonNull(url).getPath();
-        File[] files = new File(path).listFiles();
         try {
+            File[] files = new ClassPathResource(photosDirectory).getFile().listFiles();
             for (int i = 0; i < Objects.requireNonNull(files).length; i++) {
                 Product product = new Product();
                 String fileNameWithoutExtension = FilenameUtils.removeExtension(files[i].getName());
