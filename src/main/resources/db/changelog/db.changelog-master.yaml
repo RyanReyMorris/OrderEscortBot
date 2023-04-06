@@ -5,6 +5,39 @@ databaseChangeLog:
       author: eyakimov
       changes:
         - createTable:
+            tableName: contact_info
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: true
+              - column:
+                  name: phone_number
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: first_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: last_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: v_card
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 2
+      author: eyakimov
+      changes:
+        - createTable:
             tableName: customer
             columns:
               - column:
@@ -14,18 +47,158 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: true
               - column:
-                  name: chat_id
+                  name: last_message
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: contact_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_customer_contact
+                    references: contact_info(id)
+                    deleteCascade: true
+                    nullable: true
+              - column:
+                  name: user_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_in_tec_sup_process
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_service_call
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: current_command
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 3
+      author: eyakimov
+      changes:
+        - createTable:
+            tableName: service_call_request
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: true
+              - column:
+                  name: author_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_service_call_request_customer_author
+                    references: customer(id)
+                    deleteCascade: true
+              - column:
+                  name: performer_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_service_call_request_customer_performer
+                    references: customer(id)
+                    deleteCascade: true
+              - column:
+                  name: is_purchase
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 4
+      author: eyakimov
+      changes:
+        - createTable:
+            tableName: product
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: price
                   type: bigint
                   constraints:
                     nullable: true
               - column:
-                  name: is_satisfied
-                  type: boolean
+                  name: photo
+                  type: bytea
                   constraints:
                     nullable: true
               - column:
-                  name: is_admin
-                  type: boolean
-                  defaultValueBoolean: false
+                  name: quantity
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: seller
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 5
+      author: eyakimov
+      changes:
+        - createTable:
+            tableName: purchase
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: true
+              - column:
+                  name: customer_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_purchase_customer_customer
+                    references: customer(id)
+                    deleteCascade: true
+              - column:
+                  name: performer_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_purchase_customer_performer
+                    references: customer(id)
+                    deleteCascade: true
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_purchase_product
+                    references: product(id)
+                    deleteCascade: true
+              - column:
+                  name: count
+                  type: integer
                   constraints:
                     nullable: true
