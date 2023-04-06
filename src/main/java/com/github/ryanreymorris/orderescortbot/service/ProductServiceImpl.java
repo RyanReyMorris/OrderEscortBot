@@ -3,19 +3,11 @@ package com.github.ryanreymorris.orderescortbot.service;
 import com.github.ryanreymorris.orderescortbot.entity.Product;
 import com.github.ryanreymorris.orderescortbot.repository.ProductRepository;
 import com.github.ryanreymorris.orderescortbot.util.ImageUtil;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Objects;
 
 /**
  * Implementation of {@link ProductService} interface.
@@ -70,25 +62,25 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public void initProducts() {
-        try {
-            ClassLoader cl = this.getClass().getClassLoader();
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(cl);
-            Resource[] resources = resolver.getResources("classpath*:/" + photosDirectory);
-            File[] files = resources[0].getFile().listFiles();
-            for (int i = 0; i < Objects.requireNonNull(files).length; i++) {
-                Product product = new Product();
-                String fileNameWithoutExtension = FilenameUtils.removeExtension(files[i].getName());
-                product.setId(Long.valueOf(fileNameWithoutExtension));
-                product.setSeller("ООО Продавец");
-                int number = i + 1;
-                product.setName("Продукт №" + number);
-                product.setQuantity(50);
-                product.setPrice(1000L);
-                product.setPhoto(FileUtils.readFileToByteArray(files[i]));
-                save(product);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            ClassLoader cl = this.getClass().getClassLoader();
+//            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(cl);
+//            Resource[] resources = resolver.getResources("classpath*:/" + photosDirectory);
+//            File[] files = resources[0].getFile().listFiles();
+//            for (int i = 0; i < Objects.requireNonNull(files).length; i++) {
+//                Product product = new Product();
+//                String fileNameWithoutExtension = FilenameUtils.removeExtension(files[i].getName());
+//                product.setId(Long.valueOf(fileNameWithoutExtension));
+//                product.setSeller("ООО Продавец");
+//                int number = i + 1;
+//                product.setName("Продукт №" + number);
+//                product.setQuantity(50);
+//                product.setPrice(1000L);
+//                product.setPhoto(FileUtils.readFileToByteArray(files[i]));
+//                save(product);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }
