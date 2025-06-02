@@ -1,20 +1,18 @@
-# Order Escort Telegram Bot
+<div align="center">
+  <img alt="Logo" src="https://raw.githubusercontent.com/ryanreymorris/portfolio/master/public/logo.png" width="100" />
+</div>
+<h1 align="center">
+  Order Escort Telegram Bot
+</h1>
+<p align="center">
+MVP of order escort telegram bot project.
+</p>
+
 
 ## Overview
-MVP of order escort telegram bot project.
 The bot is an example of a bot that can be used for ordering products from e-shop and checking the delivery status.
 
-
-## Usage
-...
-
-## Building
-...
-
-## Troubleshooting
-...
-
-## Release Notes
+## 🚨 Release Notes
 Can be found in [RELEASE_NOTES](RELEASE_NOTES.md).
 
 ## Authors
@@ -22,9 +20,6 @@ Can be found in [RELEASE_NOTES](RELEASE_NOTES.md).
 
 ## Code of Conduct
 Please, follow [Code of Conduct](CODE_OF_CONDUCT.md) page.
-
-## Acknowledgments
-...
 
 ## Contributing
 Please, follow [Contributing](CONTRIBUTING.md) page.
