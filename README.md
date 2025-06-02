@@ -1,7 +1,9 @@
 # Order Escort Telegram Bot
 
 ## Overview
-Repository was created for a MVP of order escort telegram bot project
+MVP of order escort telegram bot project.
+The bot is an example of a bot that can be used for ordering products from e-shop and checking the delivery status.
+
 
 ## Usage
 ...
